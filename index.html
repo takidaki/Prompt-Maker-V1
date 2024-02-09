@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentence Generator</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f3f3f3;
+    }
+    .container {
+        max-width: 600px;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    label {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    input[type="text"] {
+        width: calc(100% - 80px);
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+    }
+    .btn-add {
+        background-color: #007bff;
+        color: #fff;
+    }
+    .btn-add:hover {
+        background-color: #0056b3;
+    }
+    .btn-generate {
+        background-color: #28a745;
+        color: #fff;
+    }
+    .btn-generate:hover {
+        background-color: #218838;
+    }
+    .btn-copy {
+        background-color: #ffc107;
+        color: #333;
+    }
+    .btn-copy:hover {
+        background-color: #e0a800;
+    }
+    #result {
+        margin-top: 20px;
+        font-weight: bold;
+    }
+    #copy-button {
+        margin-top: 10px;
+    }
+    .word-list {
+        margin-top: 10px;
+    }
+    .word-list-item {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #fff;
+        border-radius: 4px;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        cursor: pointer;
+    }
+    .word-list-item:hover {
+        background-color: #0056b3;
+    }
+    .history {
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <label for="word">Enter a word or sentence:</label>
+    <input type="text" id="word">
+    <button class="btn btn-add" onclick="addWordToList()">Add word</button>
+    <button class="btn btn-generate" onclick="generateSentence()">Generate Sentence</button>
+    <p id="result"></p>
+    <button class="btn btn-copy" id="copy-button" onclick="copyToClipboard()">Copy Sentence</button>
+    <div class="word-list" id="word-list"></div>
+    <div class="history" id="history"></div>
+</div>
+
+<script>
+    let sentenceHistory = [];
+
+    function addWordToList() {
+        const wordInput = document.getElementById('word');
+        const word = wordInput.value.trim();
+        if (word !== '') {
+            const wordList = document.getElementById('word-list');
+            const wordListItem = document.createElement('span');
+            wordListItem.textContent = word + ',';
+            wordListItem.classList.add('word-list-item');
+            wordListItem.addEventListener('click', function () {
+                wordListItem.remove();
+            });
+            wordList.appendChild(wordListItem);
+            wordInput.value = '';
+        }
+    }
+    
+
+    function generateSentence() {
+        const wordListItems = document.querySelectorAll('.word-list-item');
+        let sentence = '';
+        wordListItems.forEach(item => {
+            sentence += item.textContent + ' ';
+        });
+        const resultElement = document.getElementById('result');
+        resultElement.textContent = sentence.trim();
+        addToHistory(sentence.trim());
+    }
+
+    function addToHistory(sentence) {
+        sentenceHistory.unshift(sentence);
+        if (sentenceHistory.length > 10) {
+            sentenceHistory.pop();
+        }
+        displayHistory();
+    }
+
+    function displayHistory() {
+        const historyElement = document.getElementById('history');
+        historyElement.innerHTML = '<h3>Recent Sentences:</h3>';
+        const ul = document.createElement('ul');
+        sentenceHistory.forEach(sentence => {
+            const li = document.createElement('li');
+            li.textContent = sentence;
+            ul.appendChild(li);
+        });
+        historyElement.appendChild(ul);
+    }
+
+    function copyToClipboard() {
+        const resultElement = document.getElementById('result');
+        const sentence = resultElement.textContent;
+        navigator.clipboard.writeText(sentence)
+            .then(() => {
+                alert('Sentence copied to clipboard!');
+            })
+            .catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+    }
+</script>
+</body>
+</html>
